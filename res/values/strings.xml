@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Robot Commander</string>
+    
+    <string name="robot_voice_command_prompt">Say something to your robot!</string>
+    <string name="robot_text_command_prompt">or enter the command...</string><string name="robot_button_command_prompt">or click here to display predefined commands...</string>
+    
+    <string name="speak_button">Speak!</string>
+    <string name="voice_recognition_results">Results:</string>
+    <string name="textinput_prompt">Type here...</string>
+    <string name="predefined_commands">Predefined commands</string>
+</resources>
