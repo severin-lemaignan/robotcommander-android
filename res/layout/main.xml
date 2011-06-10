@@ -19,10 +19,11 @@
         android:paddingBottom="4dip"
         android:text="@string/robot_voice_command_prompt" android:layout_gravity="bottom"/>
         
-    <Button android:id="@+id/btn_speak"
+    <ImageButton android:id="@+id/btn_speak"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/speak_button" android:layout_gravity="bottom"/>
+        android:layout_gravity="bottom"
+        android:src="@android:drawable/ic_btn_speak_now" />
         
     <ListView android:id="@+id/reco_output"
         android:layout_width="match_parent"
@@ -37,10 +38,14 @@
     <EditText android:id="@+id/command_text_input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" android:hint="@string/textinput_prompt" android:layout_gravity="bottom" android:inputType="textNoSuggestions"/>
-        
-        
-    <TextView android:paddingBottom="4dip" android:layout_width="match_parent" android:text="@string/robot_button_command_prompt" android:layout_height="wrap_content" android:layout_gravity="bottom"/>
     
     
-    <Button android:text="@string/predefined_commands" android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/btn_predefined_actions" android:layout_gravity="bottom"/>
+    
+    <LinearLayout android:layout_height="wrap_content" 
+    	android:layout_width="match_parent" 
+    	android:id="@+id/linearLayout1" 
+    	android:baselineAligned="true">
+    <Button android:text="@string/predefined_commands" android:id="@+id/btn_predefined_actions" android:layout_height="match_parent" android:layout_width="wrap_content" android:layout_gravity="right"/>
+    <ImageButton android:src="@android:drawable/ic_menu_preferences" android:layout_height="wrap_content" android:id="@+id/btn_settings" android:layout_gravity="right" android:layout_width="wrap_content"></ImageButton>
+    </LinearLayout>
  </LinearLayout>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+            
+    <ListPreference
+            android:key="robot_list"
+            android:defaultValue="pr2"
+            android:title="@string/title_robot_list_preference"
+            android:summary="@string/summary_robot_list_preference"
+            android:entries="@array/entries_robot_preference"
+            android:entryValues="@array/entryvalues_robot_preference"/>
+
+    <EditTextPreference
+            android:key="custom_account"
+            android:title="@string/title_custom_account_preference"
+            android:summary="@string/summary_custom_account_preference"
+            android:hint="@string/custom_account_hint"/>
+            
+</PreferenceScreen>

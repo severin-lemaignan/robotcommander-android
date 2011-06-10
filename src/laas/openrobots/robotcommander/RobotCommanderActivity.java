@@ -4,10 +4,11 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.speech.RecognizerIntent;
@@ -18,8 +19,8 @@ import android.view.View.OnKeyListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
-//import android.widget.Toast;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -28,9 +29,12 @@ import java.util.List;
 public class RobotCommanderActivity extends Activity implements OnClickListener, OnKeyListener {
 
     private static final int VOICE_RECOGNITION_REQUEST_CODE = 1234;
-
+    private static final int PREFERENCES_REQUEST_CODE = 1235;
+    
 	private static final int DIALOG_CHOOSE_SPEECH_RECO_RESULT = 0;
 	private static final int DIALOG_NO_XMPP_CONNECTION = 1;
+	
+	
 
     private XmppSender xmppSender;
     
@@ -51,12 +55,18 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
         
         super.onCreate(savedInstanceState);
 
-        xmppSender = new XmppSender("skadge@gmail.com");
+        PreferenceManager.setDefaultValues(this, R.xml.robotcommander_preferences, true);
+        
+        xmppSender = new XmppSender();
+        
         // Inflate our UI from its XML layout description.
         setContentView(R.layout.main);
 
         // Get display items for later interaction
-        Button speakButton = (Button) findViewById(R.id.btn_speak);
+        ImageButton speakButton = (ImageButton) findViewById(R.id.btn_speak);
+        
+        ImageButton settingsButton = (ImageButton) findViewById(R.id.btn_settings);
+        settingsButton.setOnClickListener(this);
         
         edittext = (EditText) findViewById(R.id.command_text_input);
         
@@ -75,8 +85,10 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
             speakButton.setOnClickListener(this);
         } else {
             speakButton.setEnabled(false);
-            speakButton.setText("Recognizer not present");
+            Toast.makeText(this, "Recognizer not present", Toast.LENGTH_SHORT).show();
         }
+        
+        setAccount(); //Initializes account from the last preferences state
     }
     
     protected Dialog onCreateDialog(int id) {
@@ -114,7 +126,7 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
         
         case DIALOG_NO_XMPP_CONNECTION:
 
-        	builder.setMessage("No connection to the XMPP server! Your message won't be send to the robot.")
+        	builder.setMessage("No connection to the XMPP server or account not set up! Your message won't be send to the robot.")
         	       .setCancelable(true)
         		   .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
@@ -132,7 +144,19 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
     public void onClick(View v) {
         if (v.getId() == R.id.btn_speak) {
             startVoiceRecognitionActivity();
+            return;
         }
+        
+        if (v.getId() == R.id.btn_settings) {
+        	// When the button is clicked, launch an activity through this intent
+            Intent launchPreferencesIntent = new Intent().setClass(this, Preferences.class);
+            // Make it a subactivity so we know when it returns
+            startActivityForResult(launchPreferencesIntent, PREFERENCES_REQUEST_CODE);
+            
+        	return;
+        }
+        
+       
     }
     
     /**
@@ -181,7 +205,34 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
             showDialog(DIALOG_CHOOSE_SPEECH_RECO_RESULT);
 
         }
-
+        
         super.onActivityResult(requestCode, resultCode, data);
+        
+        if (requestCode == PREFERENCES_REQUEST_CODE) {
+        	setAccount();
+        }
+        
     }
+    
+    private void setAccount(){
+    	
+    	SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+    	String mode = sharedPref.getString(Preferences.KEY_SELECTED_ROBOT, "");
+    	
+    	String recipient = ""; 
+    	if (mode.equals("pr2")) {
+    		recipient = "max.at.laas@gmail.com";
+    	}
+    	else if (mode.equals("jido")) {
+    		recipient = "jidowanki@gmail.com";
+    	}
+    	else {
+    		recipient = sharedPref.getString(Preferences.KEY_DISTANT_ACCOUNT, "");
+    	}
+    	
+    	xmppSender.recipient(recipient);
+    	Toast.makeText(this, "Now connected to " + recipient, 
+    					Toast.LENGTH_SHORT).show();
+    }
+        
 }

@@ -9,4 +9,13 @@
     <string name="voice_recognition_results">Results:</string>
     <string name="textinput_prompt">Type here...</string>
     <string name="predefined_commands">Predefined commands</string>
+    <string name="custom_account_hint">e.g. toto@jabber.org</string>
+    <string name="custom_account_prompt">...or enter a custom XMPP identifier (Jabber/GTalk...)</string>
+    <string name="pr2">Max (PR2)</string>
+    <string name="jido">Jido</string>
+    <string name="choose_account_prompt">Who do you want to talk to?</string>
+    <string name="title_robot_list_preference">Select your robot</string>
+    <string name="title_custom_account_preference">Enter a custom account</string>
+    <string name="summary_custom_account_preference">Enter a valid XMPP account (Jabber/GTalk...)</string>
+    <string name="summary_robot_list_preference">Select here the robot you want to talk to</string>
 </resources>

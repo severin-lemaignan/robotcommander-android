@@ -14,8 +14,8 @@ public class XmppSender {
 	private final static String SERVER_HOST = "talk.google.com";
 	private final static int SERVER_PORT = 5222;
 	private final static String SERVICE_NAME = "gmail.com";	
-	private final static String LOGIN = "jidowanki@gmail.com";
-	private final static String PASSWORD = "jidojido";
+	private final static String LOGIN = "jidotab@gmail.com";
+	private final static String PASSWORD = "laas2011";
 
 
 	private XMPPConnection m_connection;
@@ -24,10 +24,8 @@ public class XmppSender {
 	private boolean isConnected = false;
 
 	
-	public XmppSender(String recipient) {
+	public XmppSender() {
 		super();
-		
-		this.recipient = recipient;
 		
 		try {
 			initConnection();
@@ -37,7 +35,12 @@ public class XmppSender {
 		}
 	}
 
+	public void recipient(String recipient) {
+			this.recipient = recipient;
+	}
+	
 	public boolean send(String text) {
+		if (recipient == null) return false;
 		if (!isConnected) return false;
 		
 		Message msg = new Message(recipient, Message.Type.chat);
