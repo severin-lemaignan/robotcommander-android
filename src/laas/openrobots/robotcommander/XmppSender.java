@@ -23,23 +23,6 @@ public class XmppSender {
 	
 	public XmppSender() {
 		super();
-		
-		Connection connection = new XMPPConnection("laas.fr");
-		try {
-			connection.connect();
-			connection.login("jidotab", "tx+OI3VY");
-			Chat chat = connection.getChatManager().createChat("slemaign@laas.fr", new MessageListener() {
-
-			    public void processMessage(Chat chat, Message message) {
-			        System.out.println("Received message: " + message);
-			    }
-			});
-			chat.sendMessage("Howdy!");
-		} catch (XMPPException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 	}
 	
 	public void configure(String server_host, 
