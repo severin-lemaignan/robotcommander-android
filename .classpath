@@ -3,6 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry kind="lib" path="/home/slemaign/softs-local/RobotCommander/smack.jar"/>
+	<classpathentry kind="lib" path="asmack-android-7.jar" sourcepath="asmack-android-7-source.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
