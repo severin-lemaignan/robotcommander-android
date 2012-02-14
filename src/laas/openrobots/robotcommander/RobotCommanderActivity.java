@@ -8,7 +8,6 @@ import android.preference.PreferenceManager;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.speech.RecognizerIntent;
@@ -16,12 +15,16 @@ import android.view.View;
 import android.view.KeyEvent;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ListView;
+import android.widget.AdapterView.OnItemClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,13 +33,10 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
 
     private static final int VOICE_RECOGNITION_REQUEST_CODE = 1234;
     private static final int PREFERENCES_REQUEST_CODE = 1235;
-    
+        
 	private static final int DIALOG_CHOOSE_SPEECH_RECO_RESULT = 0;
 	private static final int DIALOG_NO_XMPP_CONNECTION = 1;
 	
-	
-
-    private XmppSender xmppSender;
     
     private ArrayList<String> speech_matches;
     
@@ -46,6 +46,7 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
     private ArrayAdapter<String> transcriptAdapter;
     
     private ArrayList<String> transcriptContent = new ArrayList<String>();
+	private ConnectionManager connectionManager;
     
     /**
      * Called with the activity is first created.
@@ -57,8 +58,6 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
 
         PreferenceManager.setDefaultValues(this, R.xml.robotcommander_preferences, true);
         
-        xmppSender = new XmppSender();
-        
         // Inflate our UI from its XML layout description.
         setContentView(R.layout.main);
 
@@ -68,11 +67,21 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
         ImageButton settingsButton = (ImageButton) findViewById(R.id.btn_settings);
         settingsButton.setOnClickListener(this);
         
+        Button helloButton = (Button) findViewById(R.id.btn_hello_robot);
+        helloButton.setOnClickListener(this);
+        Button forgetButton = (Button) findViewById(R.id.btn_forget_it);
+        forgetButton.setOnClickListener(this);
+        
         edittext = (EditText) findViewById(R.id.command_text_input);
         
         edittext.setOnKeyListener(this);
 
         transcript = (ListView) findViewById(R.id.transcript);
+        transcript.setOnItemClickListener(new OnItemClickListener() {
+        	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        		publish(((TextView) view).getText().toString());
+        	}        	
+        });
         
         transcriptAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, transcriptContent);
         transcript.setAdapter(transcriptAdapter);
@@ -83,12 +92,38 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
                 new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
         if (activities.size() != 0) {
             speakButton.setOnClickListener(this);
+            speakButton.requestFocus();
         } else {
             speakButton.setEnabled(false);
             Toast.makeText(this, "Recognizer not present", Toast.LENGTH_SHORT).show();
         }
+
+        connectionManager = new ConnectionManager(this);
         
-        setAccount(); //Initializes account from the last preferences state
+        CheckBox connectionStatusCheckBox = (CheckBox) findViewById(R.id.cb_connection_status);
+        connectionStatusCheckBox.setOnCheckedChangeListener(connectionManager);
+                
+        connectionManager.connect();
+        connectionManager.setAccount(); //Initializes account from the last preferences state        
+
+    }
+    
+    public void setConnected() {
+    	CheckBox connectionStatusCheckBox = (CheckBox) findViewById(R.id.cb_connection_status);
+        TextView connectionStatus = (TextView) findViewById(R.id.text_connection_status);
+        
+    	connectionStatus.setText(this.getString(R.string.status_connected));
+    	connectionStatusCheckBox.setEnabled(true);
+    	connectionStatusCheckBox.setChecked(true);
+    }
+    
+    public void setNotConnected() {
+    	CheckBox connectionStatusCheckBox = (CheckBox) findViewById(R.id.cb_connection_status);
+        TextView connectionStatus = (TextView) findViewById(R.id.text_connection_status);
+
+    	connectionStatus.setText(this.getString(R.string.status_not_connected));
+    	connectionStatusCheckBox.setEnabled(true);
+    	connectionStatusCheckBox.setChecked(false);
     }
     
     protected Dialog onCreateDialog(int id) {
@@ -102,11 +137,7 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
         	builder.setTitle("Did you mean...");
         	builder.setItems(items, new DialogInterface.OnClickListener() {
         	    public void onClick(DialogInterface dialog, int item) {
-                	if (!xmppSender.send(speech_matches.get(item).toString())){
-                		showDialog(DIALOG_NO_XMPP_CONNECTION);
-                	}
-                	
-                    transcriptAdapter.add(speech_matches.get(item).toString());
+                	publish(speech_matches.get(item).toString());
                     removeDialog(DIALOG_CHOOSE_SPEECH_RECO_RESULT);
         	    }
         	});
@@ -123,18 +154,7 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
                 }
         	});
         	return builder.create();
-        
-        case DIALOG_NO_XMPP_CONNECTION:
-
-        	builder.setMessage("No connection to the XMPP server or account not set up! Your message won't be send to the robot.")
-        	       .setCancelable(true)
-        		   .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                	dismissDialog(DIALOG_NO_XMPP_CONNECTION);
-                }
-        	});
-        	return builder.create();
-        }
+    	}
         return null;
     }
 
@@ -155,10 +175,21 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
             
         	return;
         }
+
+        
+        if (v.getId() == R.id.btn_hello_robot) {
+        	publish("Hello robot!");
+        }
+        
+        if (v.getId() == R.id.btn_forget_it) {
+        	publish("forget it");
+        }
+        
+        
         
        
     }
-    
+    	
     /**
      * Handle the text in the text input area.
      */
@@ -170,17 +201,19 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
                 case KeyEvent.KEYCODE_ENTER:
                 	String msg = edittext.getText().toString();
                 	
-                	if (!xmppSender.send(msg)){
-                		showDialog(DIALOG_NO_XMPP_CONNECTION);
-                	}
-                	
-                    transcriptAdapter.add(msg);
+                	publish(msg);
                     edittext.setText(null);
                     return true;
             }
         }
 
         return false;
+    }
+    
+    private void publish(String msg) {
+    	connectionManager.send(msg);
+   	
+        transcriptAdapter.add(msg);
     }
 
     /**
@@ -209,30 +242,10 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
         super.onActivityResult(requestCode, resultCode, data);
         
         if (requestCode == PREFERENCES_REQUEST_CODE) {
-        	setAccount();
+        	connectionManager.setAccount();
         }
         
     }
-    
-    private void setAccount(){
-    	
-    	SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-    	String mode = sharedPref.getString(Preferences.KEY_SELECTED_ROBOT, "");
-    	
-    	String recipient = ""; 
-    	if (mode.equals("pr2")) {
-    		recipient = "max.at.laas@gmail.com";
-    	}
-    	else if (mode.equals("jido")) {
-    		recipient = "jidowanki@gmail.com";
-    	}
-    	else {
-    		recipient = sharedPref.getString(Preferences.KEY_DISTANT_ACCOUNT, "");
-    	}
-    	
-    	xmppSender.recipient(recipient);
-    	Toast.makeText(this, "Now connected to " + recipient, 
-    					Toast.LENGTH_SHORT).show();
-    }
+
         
 }

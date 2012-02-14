@@ -4,7 +4,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android">
 
             
-    <ListPreference
+    <PreferenceCategory android:title="Recipient"></PreferenceCategory><ListPreference
             android:key="robot_list"
             android:defaultValue="pr2"
             android:title="@string/title_robot_list_preference"
@@ -15,7 +15,19 @@
     <EditTextPreference
             android:key="custom_account"
             android:title="@string/title_custom_account_preference"
-            android:summary="@string/summary_custom_account_preference"
-            android:hint="@string/custom_account_hint"/>
-            
+            android:summary="@string/summary_custom_account_preference" android:hint="@string/custom_account_hint"/>
+           
+    <PreferenceCategory android:title="XMPP configuration">
+        
+    </PreferenceCategory><EditTextPreference android:key="username" android:title="Username" android:defaultValue="jidotab@laas.fr"></EditTextPreference>
+    <EditTextPreference android:key="password" android:title="Password" android:defaultValue="tx+OI3VY" android:inputType="textPassword"></EditTextPreference>
+    <EditTextPreference android:dialogTitle="Enter the XMPP service name" android:dialogMessage="e.g. laas.fr" android:defaultValue="laas.fr" android:title="Service name" android:key="servicename"></EditTextPreference>
+    <CheckBoxPreference android:summary="Use custom host settings instead of SRV record" android:title="Custom host" android:key="usecustomhost" android:defaultValue="false"></CheckBoxPreference>
+    <EditTextPreference android:key="host" android:title="Host" android:dependency="usecustomhost" android:defaultValue="xmpp.laas.fr"></EditTextPreference>
+    <EditTextPreference android:key="port" android:defaultValue="5222" android:title="Port" android:dependency="usecustomhost" android:inputType="number"></EditTextPreference>
+    
+    <CheckBoxPreference android:key="sasl" android:title="Use SASL Authentication" android:defaultValue="true"></CheckBoxPreference>
+    <CheckBoxPreference android:key="ssltls" android:summary="Require TLS encryption when connect to server" android:title="Require SSL/TLS" android:defaultValue="true"></CheckBoxPreference>
+    <CheckBoxPreference android:key="compression" android:summary="Check to enable data compression" android:defaultValue="false" android:title="Use compression"></CheckBoxPreference>
+    
 </PreferenceScreen>

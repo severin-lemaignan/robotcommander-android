@@ -20,7 +20,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-import android.widget.Toast;
 
 /**
  * Example that shows finding a preference from the hierarchy and a custom preference type.
