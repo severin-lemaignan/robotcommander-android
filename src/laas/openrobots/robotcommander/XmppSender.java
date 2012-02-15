@@ -12,14 +12,16 @@ import org.jivesoftware.smack.packet.*;
 public class XmppSender {
 
 	private XMPPConnection m_connection;
+	private Chat chat;
 	
-	public String recipient;
+	public String recipient = "";
 	private boolean isConnected = false;
 	
 	private ConnectionConfiguration config;
 
 	private String login;
 	private String pwd;
+	private MessageListener msgListener;
 	
 	public XmppSender() {
 		super();
@@ -33,9 +35,11 @@ public class XmppSender {
 					  boolean use_dnssrv, 
 					  boolean use_sasl, 
 					  boolean require_tls,
-					  boolean use_compression) throws XMPPException {
+					  boolean use_compression,
+					  MessageListener msgListener) throws XMPPException {
 
 		
+		this.msgListener = msgListener;
 		this.login = login;
 		this.pwd = pwd;
 		
@@ -85,17 +89,21 @@ public class XmppSender {
 		return this.isConnected;
 	}
 
-	public void recipient(String recipient) {
+	public void setRecipient(String recipient) {
 			this.recipient = recipient;
+			
+	        chat = m_connection.getChatManager().createChat(recipient, msgListener);
 	}
 	
-	public boolean send(String text) {
+	public String getRecipient() {
+		return recipient;
+	}
+	
+	public boolean send(String text) throws XMPPException {
 		if (recipient == null) return false;
 		if (!isConnected) return false;
 		
-		Message msg = new Message(recipient, Message.Type.chat);
-		msg.setBody(text);
-		m_connection.sendPacket(msg);
+		chat.sendMessage(text);
 		
 		return true;
 	}
@@ -107,9 +115,10 @@ public class XmppSender {
 		
         m_connection.connect();
         m_connection.login(login, pwd);
-        Presence presence = new Presence(Presence.Type.available);
-        m_connection.sendPacket(presence);
-     
+        //Presence presence = new Presence(Presence.Type.available);
+        //m_connection.sendPacket(presence);
+        
+        
 	}
 
 

@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.speech.RecognizerIntent;
+import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.view.KeyEvent;
 import android.view.View.OnClickListener;
@@ -26,11 +27,16 @@ import android.widget.Toast;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
-public class RobotCommanderActivity extends Activity implements OnClickListener, OnKeyListener {
+public class RobotCommanderActivity extends Activity implements OnClickListener, OnKeyListener, TextToSpeech.OnInitListener {
 
+	private static final String LOG_TTS = "TextToSpeech";
+	
     private static final int VOICE_RECOGNITION_REQUEST_CODE = 1234;
     private static final int PREFERENCES_REQUEST_CODE = 1235;
         
@@ -43,11 +49,14 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
     private ListView transcript;
     private EditText edittext;
 
-    private ArrayAdapter<String> transcriptAdapter;
+    //private ArrayAdapter<String> transcriptAdapter;
+    private TranscriptAdapter transcriptAdapter;
     
     private ArrayList<String> transcriptContent = new ArrayList<String>();
 	private ConnectionManager connectionManager;
     
+	private TextToSpeech mTts;
+	
     /**
      * Called with the activity is first created.
      */
@@ -57,6 +66,12 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
         super.onCreate(savedInstanceState);
 
         PreferenceManager.setDefaultValues(this, R.xml.robotcommander_preferences, true);
+        
+        // Initialize text-to-speech. This is an asynchronous operation.
+        // The OnInitListener (second argument) is called after initialization completes.
+        mTts = new TextToSpeech(this,
+            this  // TextToSpeech.OnInitListener
+            );
         
         // Inflate our UI from its XML layout description.
         setContentView(R.layout.main);
@@ -83,7 +98,8 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
         	}        	
         });
         
-        transcriptAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, transcriptContent);
+        //transcriptAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, transcriptContent);
+        transcriptAdapter = new TranscriptAdapter(this, android.R.layout.simple_list_item_1);
         transcript.setAdapter(transcriptAdapter);
 
         // Check to see if a recognition activity is present
@@ -102,9 +118,9 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
         
         CheckBox connectionStatusCheckBox = (CheckBox) findViewById(R.id.cb_connection_status);
         connectionStatusCheckBox.setOnCheckedChangeListener(connectionManager);
-                
+        
         connectionManager.connect();
-        connectionManager.setAccount(); //Initializes account from the last preferences state        
+        connectionManager.setRecipient(); //Initializes account from the last preferences state
 
     }
     
@@ -213,7 +229,12 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
     private void publish(String msg) {
     	connectionManager.send(msg);
    	
-        transcriptAdapter.add(msg);
+    	transcriptAdapter.add(msg);
+    }
+    
+    public void asyncAddToTranscript(String msg) {
+    	transcriptAdapter.asyncAdd(msg);
+    	//transcript.smoothScrollToPosition(transcriptAdapter.getCount());
     }
 
     /**
@@ -242,9 +263,55 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
         super.onActivityResult(requestCode, resultCode, data);
         
         if (requestCode == PREFERENCES_REQUEST_CODE) {
-        	connectionManager.setAccount();
+        	connectionManager.setRecipient();
         }
         
+    }
+
+	
+	@Override
+    public void onDestroy() {
+        // Don't forget to shutdown!
+        if (mTts != null) {
+            mTts.stop();
+            mTts.shutdown();
+        }
+
+        super.onDestroy();
+    }
+	
+	public void say(String text) {
+		if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("enabletts", true)) {
+			mTts.speak(text,
+	                TextToSpeech.QUEUE_FLUSH,  // Drop all pending entries in the playback queue.
+	                null);
+		}
+	}
+	
+	// Implements TextToSpeech.OnInitListener.
+    public void onInit(int status) {
+        // status can be either TextToSpeech.SUCCESS or TextToSpeech.ERROR.
+        if (status == TextToSpeech.SUCCESS) {
+            // Set preferred language to US english.
+            // Note that a language may not be available, and the result will indicate this.
+            int result = mTts.setLanguage(Locale.UK);
+            // Try this someday for some interesting results.
+            // int result mTts.setLanguage(Locale.FRANCE);
+            if (result == TextToSpeech.LANG_MISSING_DATA ||
+                result == TextToSpeech.LANG_NOT_SUPPORTED) {
+               // Lanuage data is missing or the language is not supported.
+                Log.e(LOG_TTS, "Language is not available.");
+            } else {
+
+                // The TTS engine has been successfully initialized.
+                // Greet the user.
+            	say("Welcome!");
+            	
+            }
+        } else {
+            // Initialization failed.
+            Log.e(LOG_TTS, "Could not initialize TextToSpeech.");
+        }
     }
 
         
