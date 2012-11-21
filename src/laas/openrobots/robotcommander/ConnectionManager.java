@@ -1,18 +1,24 @@
 package laas.openrobots.robotcommander;
 
+import java.io.File;
+
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smackx.filetransfer.FileTransferListener;
+import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
+import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 
 import android.content.SharedPreferences;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 
 import android.widget.CompoundButton;
 import android.widget.Toast;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
-public class ConnectionManager implements OnCheckedChangeListener, MessageListener {
+public class ConnectionManager implements OnCheckedChangeListener, MessageListener, FileTransferListener {
 	
 
 	private XmppSender xmppSender;
@@ -67,7 +73,7 @@ public class ConnectionManager implements OnCheckedChangeListener, MessageListen
 					login, pwd, 
 					use_dnssrv, 
 					use_sasl, require_tls, use_compression,
-					this);
+					this, this);
 			
 			xmpp_ok = true;
 		} catch (XMPPException e) {
@@ -135,6 +141,17 @@ public class ConnectionManager implements OnCheckedChangeListener, MessageListen
 				disconnect();
 			}
 	    }
+		
+	}
+
+	@Override
+	public void fileTransferRequest(FileTransferRequest request) {
+		IncomingFileTransfer transfer = request.accept();
+        try {
+			transfer.recieveFile(new File(Environment.getDataDirectory() + "/" + transfer.getFileName()));
+		} catch (XMPPException e) {
+			e.printStackTrace();
+		}
 		
 	}
 

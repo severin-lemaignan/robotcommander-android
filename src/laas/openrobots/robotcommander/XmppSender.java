@@ -7,7 +7,8 @@ package laas.openrobots.robotcommander;
 
 import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.ConnectionConfiguration.SecurityMode;
-import org.jivesoftware.smack.packet.*;
+import org.jivesoftware.smackx.filetransfer.FileTransferListener;
+import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 
 public class XmppSender {
 
@@ -22,6 +23,8 @@ public class XmppSender {
 	private String login;
 	private String pwd;
 	private MessageListener msgListener;
+	private FileTransferManager fileTransferManager;
+	private FileTransferListener fileListener;
 	
 	public XmppSender() {
 		super();
@@ -36,10 +39,12 @@ public class XmppSender {
 					  boolean use_sasl, 
 					  boolean require_tls,
 					  boolean use_compression,
-					  MessageListener msgListener) throws XMPPException {
+					  MessageListener msgListener,
+					  FileTransferListener fileListener) throws XMPPException {
 
 		
 		this.msgListener = msgListener;
+		this.fileListener = fileListener;
 		this.login = login;
 		this.pwd = pwd;
 		
@@ -70,7 +75,11 @@ public class XmppSender {
 	
 	public String connect(){
 		try {
-			initConnection();
+			XMPPConnection connection = initConnection();
+			
+			fileTransferManager = new FileTransferManager(connection);
+			fileTransferManager.addFileTransferListener(fileListener);
+			
 			isConnected = true;
 			return "Connected.";
 			
@@ -108,7 +117,7 @@ public class XmppSender {
 		return true;
 	}
 
-	private void initConnection() throws XMPPException {
+	private XMPPConnection initConnection() throws XMPPException {
 
 		
 		m_connection = new XMPPConnection(config);
@@ -117,6 +126,8 @@ public class XmppSender {
         m_connection.login(login, pwd);
         //Presence presence = new Presence(Presence.Type.available);
         //m_connection.sendPacket(presence);
+        
+        return m_connection;
         
         
 	}
