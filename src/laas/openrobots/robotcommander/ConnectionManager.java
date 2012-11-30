@@ -6,9 +6,6 @@ import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smackx.filetransfer.FileTransferListener;
-import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
-import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 
 import android.content.SharedPreferences;
 import android.os.Environment;
@@ -18,7 +15,7 @@ import android.widget.CompoundButton;
 import android.widget.Toast;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
-public class ConnectionManager implements OnCheckedChangeListener, MessageListener, FileTransferListener {
+public class ConnectionManager implements OnCheckedChangeListener, MessageListener {
 	
 
 	private XmppSender xmppSender;
@@ -128,6 +125,10 @@ public class ConnectionManager implements OnCheckedChangeListener, MessageListen
     public void processMessage(Chat chat, Message message) {
     	activity.asyncAddToTranscript("            Robot says: " + message.getBody());
     	activity.say(message.getBody());
+    	
+    	if (message.getBody().equalsIgnoreCase("cheese")) {
+    		this.activity.displayImage();
+    	}
     }
     
 	@Override
@@ -141,17 +142,6 @@ public class ConnectionManager implements OnCheckedChangeListener, MessageListen
 				disconnect();
 			}
 	    }
-		
-	}
-
-	@Override
-	public void fileTransferRequest(FileTransferRequest request) {
-		IncomingFileTransfer transfer = request.accept();
-        try {
-			transfer.recieveFile(new File(Environment.getDataDirectory() + "/" + transfer.getFileName()));
-		} catch (XMPPException e) {
-			e.printStackTrace();
-		}
 		
 	}
 

@@ -38,6 +38,7 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
 	
     private static final int VOICE_RECOGNITION_REQUEST_CODE = 1234;
     private static final int PREFERENCES_REQUEST_CODE = 1235;
+    private static final int IMAGE_POPUP_REQUEST_CODE = 1236;
         
 	private static final int DIALOG_CHOOSE_SPEECH_RECO_RESULT = 0;
 	private static final int DIALOG_NO_XMPP_CONNECTION = 1;
@@ -120,6 +121,7 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
         
         connectionManager.connect();
         connectionManager.setRecipient(); //Initializes account from the last preferences state
+
 
     }
     
@@ -312,6 +314,14 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
             Log.e(LOG_TTS, "Could not initialize TextToSpeech.");
         }
     }
+
+	public void displayImage() {
+    	// When the button is clicked, launch an activity through this intent
+        Intent imagePopUpIntent = new Intent().setClass(this, ImageDialog.class);
+        // Make it a subactivity so we know when it returns
+        startActivityForResult(imagePopUpIntent, IMAGE_POPUP_REQUEST_CODE);
+		
+	}
 
         
 }

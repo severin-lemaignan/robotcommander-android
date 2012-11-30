@@ -15,6 +15,6 @@
             </intent-filter>
         </activity>
         <activity android:name="Preferences" android:label="Preferences"></activity>
-
+	    <activity android:name=".ImageDialog" android:theme="@style/imagedialogstyle" />
     </application>
 </manifest>

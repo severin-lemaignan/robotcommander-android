@@ -7,8 +7,7 @@ package laas.openrobots.robotcommander;
 
 import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.ConnectionConfiguration.SecurityMode;
-import org.jivesoftware.smackx.filetransfer.FileTransferListener;
-import org.jivesoftware.smackx.filetransfer.FileTransferManager;
+import org.jivesoftware.smack.packet.Presence;
 
 public class XmppSender {
 
@@ -23,8 +22,6 @@ public class XmppSender {
 	private String login;
 	private String pwd;
 	private MessageListener msgListener;
-	private FileTransferManager fileTransferManager;
-	private FileTransferListener fileListener;
 	
 	public XmppSender() {
 		super();
@@ -70,15 +67,16 @@ public class XmppSender {
 		config.setSASLAuthenticationEnabled(use_sasl);
 		if (require_tls) config.setSecurityMode(SecurityMode.required);
 		config.setCompressionEnabled(use_compression);
-
+		
 	}
 	
 	public String connect(){
 		try {
+			Connection.DEBUG_ENABLED = true;
 			XMPPConnection connection = initConnection();
 			
-			fileTransferManager = new FileTransferManager(connection);
-			fileTransferManager.addFileTransferListener(fileListener);
+			Presence presence = new Presence(Presence.Type.available);
+			connection.sendPacket(presence);
 			
 			isConnected = true;
 			return "Connected.";
