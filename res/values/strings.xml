@@ -20,6 +20,7 @@
     <string name="summary_robot_list_preference">Select here the robot you want to talk to</string>
     <string name="hello_robot">\&quot;Hello robot!\&quot;</string>
     <string name="forget_it">\&quot;Forget it!\&quot;</string>
+    <string name="stop">\&quot;Stop!\&quot;</string>
     <string name="status_not_connected">Not connected</string>
     <string name="status_connected">Connected</string>
     <string name="status_connecting">Connecting...</string>

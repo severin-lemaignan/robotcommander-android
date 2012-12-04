@@ -86,6 +86,8 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
         helloButton.setOnClickListener(this);
         Button forgetButton = (Button) findViewById(R.id.btn_forget_it);
         forgetButton.setOnClickListener(this);
+        Button stopButton = (Button) findViewById(R.id.btn_stop);
+        stopButton.setOnClickListener(this);
         
         edittext = (EditText) findViewById(R.id.command_text_input);
         
@@ -200,6 +202,10 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
         
         if (v.getId() == R.id.btn_forget_it) {
         	publish("forget it");
+        }
+        
+        if (v.getId() == R.id.btn_stop) {
+        	publish("Stop!");
         }
         
         

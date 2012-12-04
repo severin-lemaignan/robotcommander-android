@@ -34,18 +34,34 @@
 	        android:layout_gravity="bottom"
 	        android:src="@android:drawable/ic_btn_speak_now" android:layout_marginLeft="50dip" android:layout_marginRight="20dip" android:layout_marginTop="20dip" android:layout_marginBottom="20dip"/>
     	
-    	<LinearLayout android:id="@+id/linearLayout2" android:layout_height="match_parent" android:orientation="vertical" android:layout_width="match_parent" android:layout_marginRight="10dip">
-    	<Button 
-    		android:text="@string/hello_robot" 
-    		android:id="@+id/btn_hello_robot" 
-    		android:layout_width="wrap_content" 
-    		android:layout_height="wrap_content" android:layout_weight="1" android:layout_gravity="right"/>
-    	<Button 
-    		android:text="@string/forget_it" 
-    		android:id="@+id/btn_forget_it" 
-    		android:layout_height="wrap_content" 
-    		android:layout_width="wrap_content" 
-    		android:layout_weight="1" android:layout_gravity="right"/>
+    	<LinearLayout
+    	    android:id="@+id/linearLayout2"
+    	    android:layout_width="match_parent"
+    	    android:layout_height="match_parent"
+    	    android:layout_marginRight="10dip"
+    	    android:gravity="right"
+    	    android:orientation="vertical" >
+
+    	<Button
+    	    android:id="@+id/btn_hello_robot"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:layout_gravity="right"
+    	    android:text="@string/hello_robot" />
+
+    	<Button
+    	    android:id="@+id/btn_forget_it"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:layout_gravity="right"
+    	    android:text="@string/forget_it" />
+
+    	<Button
+    	    android:id="@+id/btn_stop"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:text="@string/stop" />
+
     	</LinearLayout>
     </LinearLayout>
     
