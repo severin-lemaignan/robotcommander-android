@@ -24,4 +24,6 @@
     <string name="status_not_connected">Not connected</string>
     <string name="status_connected">Connected</string>
     <string name="status_connecting">Connecting...</string>
+    <string name="predef_info">Predefined inputs can be configured from the Preferences panel</string>
 </resources>
+

@@ -36,12 +36,10 @@ public class XmppSender {
 					  boolean use_sasl, 
 					  boolean require_tls,
 					  boolean use_compression,
-					  MessageListener msgListener,
-					  FileTransferListener fileListener) throws XMPPException {
+					  MessageListener msgListener) throws XMPPException {
 
 		
 		this.msgListener = msgListener;
-		this.fileListener = fileListener;
 		this.login = login;
 		this.pwd = pwd;
 		

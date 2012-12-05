@@ -10,9 +10,12 @@
 
     
            
-    <PreferenceCategory android:title="XMPP configuration">
+    <PreferenceCategory android:title="Predefined Actions" android:summary='Store here up to 6 predefined inputs, accessible from the "Predefined actions" button.'>
+        <EditTextPreference android:key="predef1" android:title="Action 1" android:defaultValue="Look at me"/><EditTextPreference android:key="predef2" android:title="Action 2" android:defaultValue="Come to me"/><EditTextPreference android:key="predef3" android:title="Action 3"/><EditTextPreference android:key="predef4" android:title="Action 4"/><EditTextPreference android:key="predef5" android:title="Action 5"/><EditTextPreference android:key="predef6" android:title="Action 6"/>
+    </PreferenceCategory><PreferenceCategory android:title="XMPP configuration">
         
     <EditTextPreference android:key="username" android:title="Username" android:defaultValue="jidotab"></EditTextPreference><EditTextPreference android:key="password" android:title="Password" android:defaultValue="tx+OI3VY" android:inputType="textPassword"></EditTextPreference><EditTextPreference android:dialogTitle="Enter the XMPP service name" android:dialogMessage="e.g. laas.fr" android:defaultValue="laas.fr" android:title="Service name" android:key="servicename"></EditTextPreference><CheckBoxPreference android:summary="Use custom host settings instead of SRV record" android:title="Custom host" android:key="usecustomhost" android:defaultValue="false"></CheckBoxPreference><EditTextPreference android:key="host" android:title="Host" android:dependency="usecustomhost" android:defaultValue="xmpp.laas.fr"></EditTextPreference><EditTextPreference android:key="port" android:defaultValue="5222" android:title="Port" android:dependency="usecustomhost" android:inputType="number"></EditTextPreference><CheckBoxPreference android:key="sasl" android:title="Use SASL Authentication" android:defaultValue="true"></CheckBoxPreference><CheckBoxPreference android:key="ssltls" android:summary="Require TLS encryption when connect to server" android:title="Require SSL/TLS" android:defaultValue="true"></CheckBoxPreference><CheckBoxPreference android:key="compression" android:summary="Check to enable data compression" android:defaultValue="false" android:title="Use compression"></CheckBoxPreference></PreferenceCategory>
+    
     
     
     

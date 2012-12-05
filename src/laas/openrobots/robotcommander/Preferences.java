@@ -16,10 +16,14 @@
 
 package laas.openrobots.robotcommander;
 
+import java.util.Vector;
+
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.PreferenceActivity;
+import android.widget.Button;
 
 /**
  * Example that shows finding a preference from the hierarchy and a custom preference type.
@@ -27,7 +31,12 @@ import android.preference.PreferenceActivity;
 public class Preferences extends PreferenceActivity implements OnSharedPreferenceChangeListener {
     public static final String KEY_DISTANT_ACCOUNT = "custom_account";
     public static final String KEY_SELECTED_ROBOT = "robot_list";
-
+    
+    public static final String KEY_PREDEF_ACTION = "predef";
+    
+    static private int maxPredefCommands = 6;
+    private Vector<EditTextPreference> predefTexts;
+    
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +44,12 @@ public class Preferences extends PreferenceActivity implements OnSharedPreferenc
 
         // Load the XML preferences file
         addPreferencesFromResource(R.xml.robotcommander_preferences);
+        
+        predefTexts = new Vector<EditTextPreference>();
+        
+        for (Integer i = 1; i <= maxPredefCommands ; i++) {
+        	predefTexts.add((EditTextPreference) getPreferenceScreen().findPreference(KEY_PREDEF_ACTION + i.toString()));
+        }
 
     }
     
@@ -44,6 +59,10 @@ public class Preferences extends PreferenceActivity implements OnSharedPreferenc
 
         // Set up a listener whenever a key changes
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+        
+        for (EditTextPreference p : predefTexts){
+        	p.setSummary(p.getText());
+        }
     }
 
     @Override
@@ -63,7 +82,7 @@ public class Preferences extends PreferenceActivity implements OnSharedPreferenc
             	finish();
             }
         }
-        if (key.equals(KEY_DISTANT_ACCOUNT)) {
+    	else if (key.equals(KEY_DISTANT_ACCOUNT)) {
         	//If the user modify the custom account, automatically set the
         	// 'robot' type to custom.
         	SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -71,6 +90,11 @@ public class Preferences extends PreferenceActivity implements OnSharedPreferenc
         	editor.commit();
         	
         	finish();
+        }
+        
+        else if (key.startsWith(KEY_PREDEF_ACTION)) {
+        	Integer index = Integer.valueOf(key.substring(key.length() - 1)) - 1;
+            predefTexts.get(index).setSummary(sharedPreferences.getString(key, "(not defined yet)")); 
         }
     }
     

@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.speech.RecognizerIntent;
@@ -34,11 +35,14 @@ import java.util.Locale;
 
 public class RobotCommanderActivity extends Activity implements OnClickListener, OnKeyListener, TextToSpeech.OnInitListener {
 
+	public static SharedPreferences prefs;
+	
 	private static final String LOG_TTS = "TextToSpeech";
 	
     private static final int VOICE_RECOGNITION_REQUEST_CODE = 1234;
     private static final int PREFERENCES_REQUEST_CODE = 1235;
     private static final int IMAGE_POPUP_REQUEST_CODE = 1236;
+    private static final int PREDEFINED_ACTIONS_REQUEST_CODE = 1237;
         
 	private static final int DIALOG_CHOOSE_SPEECH_RECO_RESULT = 0;
 	private static final int DIALOG_NO_XMPP_CONNECTION = 1;
@@ -66,6 +70,8 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
         super.onCreate(savedInstanceState);
 
         PreferenceManager.setDefaultValues(this, R.xml.robotcommander_preferences, true);
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
         
         // Initialize text-to-speech. This is an asynchronous operation.
         // The OnInitListener (second argument) is called after initialization completes.
@@ -81,6 +87,9 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
         
         ImageButton settingsButton = (ImageButton) findViewById(R.id.btn_settings);
         settingsButton.setOnClickListener(this);
+        
+        Button predefButton = (Button) findViewById(R.id.btn_predefined_actions);
+        predefButton.setOnClickListener(this);
         
         Button helloButton = (Button) findViewById(R.id.btn_hello_robot);
         helloButton.setOnClickListener(this);
@@ -186,6 +195,15 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
             return;
         }
         
+        if (v.getId() == R.id.btn_predefined_actions) {
+        	// When the button is clicked, launch an activity through this intent
+            Intent launchPredefinedActionsIntent = new Intent().setClass(this, PredefinedActionsActivity.class);
+            // Make it a subactivity so we know when it returns
+            startActivityForResult(launchPredefinedActionsIntent, PREDEFINED_ACTIONS_REQUEST_CODE);
+            
+        	return;
+        }
+        
         if (v.getId() == R.id.btn_settings) {
         	// When the button is clicked, launch an activity through this intent
             Intent launchPreferencesIntent = new Intent().setClass(this, Preferences.class);
@@ -265,6 +283,11 @@ public class RobotCommanderActivity extends Activity implements OnClickListener,
             speech_matches = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             showDialog(DIALOG_CHOOSE_SPEECH_RECO_RESULT);
 
+        }
+        
+        if (requestCode == PREDEFINED_ACTIONS_REQUEST_CODE && resultCode == RESULT_OK) {
+        	String text = data.getStringExtra("text");
+            if (text.length() != 0) publish(text);
         }
         
         super.onActivityResult(requestCode, resultCode, data);

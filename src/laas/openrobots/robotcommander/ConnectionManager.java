@@ -64,13 +64,12 @@ public class ConnectionManager implements OnCheckedChangeListener, MessageListen
 	    boolean use_compression = sharedPref.getBoolean("compression", false);
 	    
 		try {
-			xmppSender.configure( 
-					server_host, server_port, 
+			xmppSender.configure(server_host, server_port, 
 					service_name, 
 					login, pwd, 
 					use_dnssrv, 
 					use_sasl, require_tls, use_compression,
-					this, this);
+					this);
 			
 			xmpp_ok = true;
 		} catch (XMPPException e) {
